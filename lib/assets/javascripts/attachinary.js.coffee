@@ -6,6 +6,11 @@
       disableWith: 'Uploading...'
       indicateProgress: true
       invalidFormatMessage: 'Invalid file format'
+      noImageTemplate: """
+        <ul>
+          <li class="no-images">Drag an image here</li>
+        </ul>
+        """
       template: """
         <ul>
           <% for(var i=0; i<files.length; i++){ %>
@@ -23,8 +28,10 @@
         </ul>
       """
       render: (files) ->
-        $.attachinary.Templating.template(@template, files: files)
-
+        if files.length > 0
+          $.attachinary.Templating.template(@template, files: files)
+        else
+          $.attachinary.Templating.template(@noImageTemplate)
 
   $.fn.attachinary = (options) ->
     settings = $.extend {}, $.attachinary.config, options
@@ -160,7 +167,7 @@
         @$filesContainer.show()
       else
         @$filesContainer.append @makeHiddenField(null)
-        @$filesContainer.hide()
+        @$filesContainer.append @config.render(@files)
 
     makeHiddenField: (value) ->
       $input = $('<input type="hidden">')
